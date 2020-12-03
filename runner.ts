@@ -21,8 +21,19 @@ export {};
     Deno.exit(1);
   }
 
+  // Fetch input:
+  //const inputResponse = await fetch(`https://adventofcode.com/${year}/day/${day}/input`);
+  //const input = await inputResponse.text();
+  let input;
+  const inputPath = `./${year}/Day_${day}/input.txt`
   try {
-    await foundModule.default();
+    input = await Deno.readTextFile(inputPath);
+  } catch {
+    console.error(`Could not read problem input. Place your input in a file '${inputPath}'`); 
+  }
+  
+  try {
+    await foundModule.default(input);
   } catch (e) {
     console.error(e);
     Deno.exit(1);
