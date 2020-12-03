@@ -21,9 +21,6 @@ export {};
     Deno.exit(1);
   }
 
-  // Fetch input:
-  //const inputResponse = await fetch(`https://adventofcode.com/${year}/day/${day}/input`);
-  //const input = await inputResponse.text();
   let input;
   const inputPath = `./${year}/Day_${day}/input.txt`
   try {
