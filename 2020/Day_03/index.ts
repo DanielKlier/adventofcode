@@ -7,7 +7,7 @@ function getSquares(input: string): Square[][] {
   return input.split('\n').map(line => line.split('') as Square[]);
 }
 
-async function day3(input: string) {
+async function day03(input: string) {
   const squares = getSquares(input);
   const slopes = [[1, 1], [3, 1], [5, 1], [7, 1], [1, 2]];
   const width = squares[0].length;
@@ -34,4 +34,4 @@ async function day3(input: string) {
   console.log(`The product of trees encountered is ${trees.reduce((p, t) => p * t, 1)}`);
 }
 
-export default day3;
+export default day03;

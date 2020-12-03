@@ -40,7 +40,7 @@ function isPasswordValidNewPolicy(password: Password): boolean {
   return charInMinPos && !charInMaxPos || charInMaxPos && !charInMinPos;
 }
 
-async function day2(input: string) {
+async function day02(input: string) {
   const passwords = getPasswords(input);
 
   const validPasswords = passwords.filter(isPasswordValid);
@@ -50,4 +50,4 @@ async function day2(input: string) {
   console.log(`There are ${validPasswordsNewPolicy.length} valid passwords according to the new policy.`);
 }
 
-export default day2;
+export default day02;

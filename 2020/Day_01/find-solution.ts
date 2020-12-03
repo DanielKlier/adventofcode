@@ -3,7 +3,7 @@
  * @param {Array.<number>} input input numbers
  * @returns {number}
  */
-function findSolution(input) {
+function findSolution(input: number[]): number|undefined {
   const targetSum = 2020;
   let steps = 0;
 
