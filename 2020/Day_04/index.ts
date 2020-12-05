@@ -1,3 +1,5 @@
+import { assertFalse, assertTrue } from "../utils/test.ts";
+
 // Solution for 2020, day 04
 const isValidNumerical = (digits: number, min: number, max: number) => (
   val: string
@@ -71,14 +73,6 @@ function isValidPassportAdvanced(passport: Passport/*, log = false*/) {
   }*/
 
   return valid;
-}
-
-function assertTrue(val: boolean) {
-  if (!val) throw Error(`Expected true but got false`);
-}
-
-function assertFalse(val: boolean) {
-  if (val) throw Error(`Expected false but got true`);
 }
 
 function testValidators() {
