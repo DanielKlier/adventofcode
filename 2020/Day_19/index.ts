@@ -1,8 +1,8 @@
 // Solution for 2020, day 19
-import { lines } from "../utils/input.ts";
+import { lines, parse } from "../utils/input.ts";
 import { assertEquals } from "../utils/test.ts";
 
-type Rules = Record<string | symbol | number, string>;
+type Rules = Record<number, number[][] | string>;
 type Messages = string[];
 
 function parseInput(input: string): [Rules, Messages] {
@@ -10,111 +10,70 @@ function parseInput(input: string): [Rules, Messages] {
   return [
     lines(rulePart)
       .map((l) => l.split(": "))
-      .reduce((o, [label, rule]) => ({ ...o, [label]: rule }), {} as Rules),
+      .map(([index, rule]) => [
+        index,
+        rule.startsWith('"')
+          ? rule.substr(1, 1)
+          : rule
+              .split(" | ")
+              .filter((a) => a)
+              .map((sr) => sr.split(" "))
+              .map((s) => s.map(parse.int)),
+      ])
+      .reduce(
+        (o, [label, rule]) => ({ ...o, [label as string]: rule }),
+        {} as Rules
+      ),
     lines(msgPart),
   ];
 }
 
-class Parser {
-  private symbols: string[] = [];
-  private sym?: string;
-  private backtrackBuffer: string[] = [];
-
-  constructor(private rules: Rules, private debug: boolean = false) {}
-
-  parse(chars: string) {
-    this.log("Begin parse");
-    this.symbols = chars.split("");
-    this.backtrackBuffer = [];
-    this.nextSym();
-    this.nonTerminal("0");
-    this.log("End parse");
-    if (this.symbols.length) {
-      this.log("Excess symbols");
-      this.error();
-    }
-  }
-
-  private log(...args: any[]) {
-    this.debug && console.log(args);
-  }
-
-  private terminal(sym: string) {
-    if (sym === this.sym) {
-      this.log("Term", sym);
-      this.nextSym();
-      this.backtrackBuffer = [];
-    } else {
-      this.error();
-    }
-  }
-
-  private sequence(seq: string[]) {
-    for (const r of seq) {
-      this.nonTerminal(r);
-    }
-  }
-
-  private nonTerminal(label: string) {
-    const rule = this.rules[label];
-    const termMatches = rule.match(/\"(.)\"/);
-    if (termMatches) {
-      this.terminal(termMatches[1]);
-    } else {
-      const [l, r] = rule.split(" | ");
-      try {
-        this.log("Seq", l);
-        this.sequence(l.split(" "));
-      } catch {
-        if (r) {
-          this.log("Alt Seq", r);
-          this.symbols.unshift.apply(this.symbols, this.backtrackBuffer);
-          this.log("Backtracking with", this.backtrackBuffer);
-          this.backtrackBuffer = [];
-          this.sequence(r.split(" "));
-        } else {
-          this.error();
-        }
-      }
-    }
-  }
-
-  private nextSym() {
-    this.sym = this.symbols.shift();
-    if (this.sym) {
-      this.backtrackBuffer.push(this.sym);
-    }
-  }
-
-  private error() {
-    this.log("Parse error", this.sym);
-    throw new Error("Parse error: " + this.sym);
-  }
-}
-
 const validator = (rules: Rules) => {
-  const parser = new Parser(rules, true);
-  return (message: string): boolean => {
-    try {
-      parser.parse(message);
-      return true;
-    } catch {
+  const validate = ([c, ...rest]: string[], ruleStack: (string|number)[]): boolean => {
+    if (!c && !ruleStack.length) return true;
+
+    if ((!c && ruleStack.length) || (c && !ruleStack.length)) {
       return false;
     }
+
+    const rule = ruleStack.shift();
+
+    if (typeof rule === "string") {
+      return rule === c && validate(rest, ruleStack.slice());
+    }
+
+    if (!rule) {
+      return false;
+    }
+
+    for (const sr of rules[rule]) {
+      if (validate([c, ...rest], [...sr, ...ruleStack])) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  return (message: string): boolean => {
+    return validate(message.split(""), (rules[0] as (string|number)[][])[0].slice());
   };
 };
 
 function part1([rules, messages]: [Rules, Messages]): number {
   const validate = validator(rules);
-  return messages.slice(0, 1).filter(validate).length;
+  return messages.filter(validate).length;
 }
 
 function part2([rules, messages]: [Rules, Messages]): number {
-  return 0;
+  rules[8] = [[42], [42, 8]];
+  rules[11] = [[42, 31], [42, 11, 31]];
+  const validate = validator(rules);
+  return messages.filter(validate).length;
 }
 
 async function day19(input: string): Promise<void> {
-  //testPart1();
+  testPart1();
 
   const parsed = parseInput(input);
   console.log(`Part1: ${part1(parsed)}`);
