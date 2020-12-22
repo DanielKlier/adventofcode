@@ -3,12 +3,34 @@ import { matrix } from "../utils/array.ts";
 import { lines } from "../utils/input.ts";
 import { assertEquals } from "../utils/test.ts";
 
+const monsterPattern = [
+  /..................#./,
+  /#....##....##....###/,
+  /.#..#..#..#..#..#.../,
+];
+
 interface Tile {
   id: number;
   tile: string[][];
   rotate: number;
   flipped: boolean;
 }
+
+enum Edge {
+  TOP,
+  RIGHT,
+  BOTTOM,
+  LEFT,
+}
+interface TileMatch {
+  a: Tile;
+  b: Tile;
+  edge: Edge;
+  i: number;
+  j: number;
+}
+
+type AdjMat = (TileMatch | null)[][];
 
 function parseTile(input: string): string[][] {
   return lines(input).map((l) => l.split(""));
@@ -18,23 +40,48 @@ function drawTile(tile: Tile): string {
   return tile.tile.map((l) => l.join("")).join("\n");
 }
 
-function drawGrid(grid: Tile[][]): string {
-  let result = "";
-  const N = grid.length;
-  for (let i = 0; i < N; i++) {
-    let lines = Array(N).fill("");
-    for (let j = 0; j < N; j++) {
-      /*for (let k = 0; k < N; k ++) {
-        console.log(lines[k]);
-        lines[k] += grid[i][j].tile[k].join('');
-      }*/
-      const tile = grid[i][j];
-      console.log(tile.id, tile.flipped, tile.rotate);
-      console.log(drawTile(tile));
+function markMonsters(tile: Tile): [Tile,number] {
+  const tileCopy = {
+    ...tile,
+    tile: parseTile(tile.tile.map((r) => r.join("")).join("\n")),
+  };
+  const lines = tile.tile.map((r) => r.join(""));
+  const ll = lines[0].length;
+  const mpl = monsterPattern[0].source.length;
+  let matches = 0;
+  for (let i = 0; i < lines.length - monsterPattern.length; i++) {
+    const subLines = lines.slice(i, monsterPattern.length + i);
+    for (let off = 0; off < ll - mpl; off++) {
+      if (
+        subLines.every((sl, i) => sl.substr(off, mpl).match(monsterPattern[i]))
+      ) {
+        for (let subI = 0; subI < subLines.length; subI++) {
+          for (let subJ = 0; subJ < mpl; subJ++) {
+            if (monsterPattern[subI].source[subJ] === "#") {
+              tileCopy.tile[i + subI][subJ + off] = "O";
+            }
+          }
+        }
+        matches++;
+      }
     }
-    result += lines.join("\n");
   }
-  return result;
+  return [tileCopy, matches];
+}
+
+function drawGrid(grid: Tile[][]): string {
+  const N = grid.length;
+  const M = grid[0][0].tile.length - 2;
+  let lines: string[] = Array(N * M).fill("");
+  for (let i = 0; i < N; i++) {
+    for (let j = 0; j < N; j++) {
+      const tile = grid[i][j].tile;
+      for (let k = 0; k < M; k++) {
+        lines[i * M + k] += tile[k + 1].join("").substr(1, M);
+      }
+    }
+  }
+  return lines.join("\n");
 }
 
 function flip(tile: Tile): Tile {
@@ -56,7 +103,7 @@ function rotate(tile: Tile): Tile {
   return {
     ...tile,
     tile: res,
-    rotate: tile.rotate + 1,
+    rotate: (tile.rotate + 1) % 4,
   };
 }
 
@@ -108,108 +155,154 @@ const matchOne = (eq: (a: Tile, b: Tile) => boolean) => (
   return null;
 };
 
-const matchMany = (eq: (a: Tile, b: Tile) => boolean) => {
-  const one = matchOne(eq);
-  return (tile: Tile, tiles: Tile[]): Tile | null => {
-    for (const other of tiles) {
-      if (one(tile, other) !== null) return other;
-    }
-    return null;
-  };
-};
+const matchTop = matchOne(eqTop);
+const matchRight = matchOne(eqRight);
+const matchBottom = matchOne(eqBottom);
+const matchLeft = matchOne(eqLeft);
 
-const manyTop = matchMany(eqTop);
-const manyBottom = matchMany(eqBottom);
-const manyLeft = matchMany(eqLeft);
-const manyRight = matchMany(eqRight);
+function adjacencyMatrix(tiles: Tile[]): AdjMat {
+  const mat = matrix<TileMatch | null>(tiles.length, tiles.length, null);
 
-function allButOne(tile: Tile, tiles: Tile[]): Tile[] {
-  return tiles.filter((t) => t.id !== tile.id);
+  tiles.forEach((tile, i) => {
+    tiles.forEach((ot, j) => {
+      if (ot === tile) return;
+      let match: Tile | null;
+      if ((match = matchTop(tile, ot))) {
+        mat[i][j] = { a: tile, b: match, edge: Edge.TOP, i, j };
+      } else if ((match = matchRight(tile, ot))) {
+        mat[i][j] = { a: tile, b: match, edge: Edge.RIGHT, i, j };
+      } else if ((match = matchBottom(tile, ot))) {
+        mat[i][j] = { a: tile, b: match, edge: Edge.BOTTOM, i, j };
+      } else if ((match = matchLeft(tile, ot))) {
+        mat[i][j] = { a: tile, b: match, edge: Edge.LEFT, i, j };
+      }
+    });
+  });
+
+  return mat;
 }
 
-/*function findTile(
+function part1(adjMat: AdjMat): number {
+  const corners = adjMat
+    .filter((row) => row.filter((a) => a).length === 2)
+    .map((r) => r.find((a) => a)?.a!);
+  return corners.reduce((p, c) => p * c.id, 1);
+}
+
+function dfs(
+  start: number,
+  x: number,
+  y: number,
   tiles: Tile[],
-  top: Tile | null,
-  left: Tile | null,
-  right: boolean,
-  bottom: boolean
-): Tile | null {
-  for (const tile of tiles) {
-    const others = allButOne(tile, tiles);
-    let res = tile;
-    for (let f = 0; f < 2; f++) {
-      for (let rot = 0; rot < 4; rot++) {
-        if (manyTop(res, others) === top && manyLeft(res, others) === left && !!manyRight(res, others) === right && !!manyBottom(res, others) === bottom) {
-          return res;
-        }
-        res = rotate(res);
+  adjMat: AdjMat,
+  grid: Tile[][],
+  visited: boolean[],
+  rot: number,
+  flip: boolean,
+  tile: Tile
+) {
+  visited[start] = true;
+  grid[y][x] = tile;
+  for (let i = 0; i < tiles.length; i++) {
+    const adj = adjMat[start][i];
+    if (adj) {
+      let dx = 0,
+        dy = 0;
+      switch ((adj.edge + rot) % 4) {
+        case Edge.BOTTOM:
+          dy = 1;
+          break;
+        case Edge.LEFT:
+          dx = -1;
+          break;
+        case Edge.RIGHT:
+          dx = 1;
+          break;
+        case Edge.TOP:
+          dy = -1;
+          break;
       }
-      res = flip(res);
+      if (!visited[i]) {
+        if (flip) dx = -dx;
+        dfs(
+          i,
+          x + dx,
+          y + dy,
+          tiles,
+          adjMat,
+          grid,
+          visited,
+          rot + adj.b.rotate,
+          adj.b.flipped,
+          adj.b
+        );
+      }
     }
   }
-  return null;
-}*/
-function findTile(
-  top: boolean,
-  right: boolean,
-  bottom: boolean,
-  left: boolean,
-  taken: Tile[],
-  remaining: Tile[],
-): Tile | null {
-  for (const tile of remaining) {
-    const others = allButOne(tile, [...remaining, ...taken]);
-    let res = tile;
+}
+
+function part2(tiles: Tile[], adjMat: AdjMat): number {
+  const N = Math.sqrt(adjMat.length);
+  const grid = matrix<Tile>(N, N);
+  const startRow = adjMat
+    .find(
+      (row) =>
+        row.filter((a) => a).length === 2 &&
+        row.find((m) => m?.edge === Edge.RIGHT) &&
+        row.find((m) => m?.edge === Edge.BOTTOM)
+    )
+    ?.filter((a) => a);
+  const startTile = startRow![0];
+  let start = startTile?.i!;
+
+  dfs(
+    start,
+    0,
+    0,
+    tiles,
+    adjMat,
+    grid,
+    Array(tiles.length).fill(false),
+    0,
+    false,
+    startTile?.a!
+  );
+
+  const image = drawGrid(grid);
+  let imageTile: Tile = {
+    tile: parseTile(image),
+    flipped: false,
+    id: 0,
+    rotate: 0,
+  };
+
+  let maxMatches = 0;
+  let maxMatchTile: Tile;
+  for (let rot = 0; rot < 4; rot++) {
     for (let f = 0; f < 2; f++) {
-      for (let rot = 0; rot < 4; rot++) {
-        if (
-          !!manyLeft(res, others) === left &&
-          !!manyRight(res, others) === right &&
-          !!manyTop(res, others) === top &&
-          !!manyBottom(res, others) === bottom
-        ) {
-          return tile;
-        }
-        res = rotate(res);
+      const [matchingTile, matches] = markMonsters(imageTile);
+      if (matches > maxMatches) {
+        maxMatchTile = matchingTile;
+        maxMatches = matches;
       }
-      res = flip(res);
+      imageTile = flip(imageTile);
     }
+    imageTile = rotate(imageTile);
   }
-  return null;
-}
 
-function part1(input: string): number {
-  const tiles = getTiles(input);
-  let remainingTiles = tiles;
-  let takenTiles: Tile[] = [];
-
-  const topLeft = findTile(false, true, true, false, takenTiles, remainingTiles);
-  remainingTiles = allButOne(topLeft!, remainingTiles);
-  takenTiles.push(topLeft!);
-
-  const topRight = findTile(false, false, true, true, takenTiles, remainingTiles);
-  remainingTiles = allButOne(topRight!, remainingTiles);
-  takenTiles.push(topRight!);
-
-  const bottomRight = findTile(true, false, false, true, takenTiles, remainingTiles);
-  remainingTiles = allButOne(bottomRight!, remainingTiles);
-  takenTiles.push(bottomRight!);
-
-  const bottomLeft = findTile(true, true, false, false, takenTiles, remainingTiles);
-  remainingTiles = allButOne(bottomLeft!, remainingTiles);
-  takenTiles.push(bottomLeft!);
-
-  return topLeft!.id * topRight!.id * bottomLeft!.id * bottomRight!.id;
-}
-
-function part2(input: unknown[]): number {
-  return 0;
+  return maxMatchTile!.tile.reduce(
+    (sum, row) => sum + row.filter((s) => s === "#").length,
+    0
+  );
 }
 
 async function day20(input: string): Promise<void> {
   tests();
- 
-  console.log(`Part1: ${part1(input)}`);
+
+  const tiles = getTiles(input);
+  const adjMat = adjacencyMatrix(tiles);
+
+  console.log(`Part1: ${part1(adjMat)}`);
   /*console.log(`Part2: ${part2(inputLines)}`);*/
 }
 
@@ -259,6 +352,7 @@ function tests() {
   testFlip();
   testRotate();
   testPart1();
+  testPart2();
 }
 
 const testInput = `Tile 2311:
@@ -370,5 +464,39 @@ Tile 3079:
 ..#.###...`;
 
 function testPart1() {
-  assertEquals(part1(testInput), 20899048083289);
+  const tiles = getTiles(testInput);
+  const adjMat = adjacencyMatrix(tiles);
+  assertEquals(part1(adjMat), 20899048083289);
 }
+
+function testPart2() {
+  const tiles = getTiles(testInput);
+  const adjMat = adjacencyMatrix(tiles);
+  console.log(drawTile(flip(rotate({id: 1, rotate: 0, flipped: false, tile: parseTile(in2)}))));
+  assertEquals(part2(tiles, adjMat), 273);
+}
+
+const in2 = `.#.#..#.##...#.##..#####
+###....#.#....#..#......
+##.##.###.#.#..######...
+###.#####...#.#####.#..#
+##.#....#.##.####...#.##
+...########.#....#####.#
+....#..#...##..#.#.###..
+.####...#..#.....#......
+#..#.##..#..###.#.##....
+#.####..#.####.#.#.###..
+###.#.#...#.######.#..##
+#.####....##..########.#
+##..##.#...#...#.#.#.#..
+...#..#..#.#.##..###.###
+.#.#....#.##.#...###.##.
+###.#...#..#.##.######..
+.#.#.###.##.##.#..#.##..
+.####.###.#...###.#..#.#
+..#.#..#..#.#.#.####.###
+#..####...#.#.#.###.###.
+#####..#####...###....##
+#.##..#..#...#..####...#
+.#.###..##..##..####.##.
+...###...##...#...#..###`;
