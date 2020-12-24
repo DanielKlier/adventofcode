@@ -33,6 +33,21 @@
         "--allow-all"
       ],
       "attachSimplePort": 9229
+    },
+    {
+      "name": "Day 22",
+      "request": "launch",
+      "type": "pwa-node",
+      "program": "${workspaceFolder}/runner.ts",
+      "cwd": "${workspaceFolder}",
+      "args": ["2020", "22"],
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "run",
+        "--inspect-brk",
+        "--allow-all"
+      ],
+      "attachSimplePort": 9229
     }
   ]
 }
