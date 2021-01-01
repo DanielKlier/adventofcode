@@ -40,7 +40,7 @@ function drawTile(tile: Tile): string {
   return tile.tile.map((l) => l.join("")).join("\n");
 }
 
-function markMonsters(tile: Tile): [Tile,number] {
+function markMonsters(tile: Tile): [Tile, number] {
   const tileCopy = {
     ...tile,
     tile: parseTile(tile.tile.map((r) => r.join("")).join("\n")),
@@ -189,92 +189,68 @@ function part1(adjMat: AdjMat): number {
   return corners.reduce((p, c) => p * c.id, 1);
 }
 
-function dfs(
-  start: number,
-  x: number,
-  y: number,
-  tiles: Tile[],
-  adjMat: AdjMat,
-  grid: Tile[][],
-  visited: boolean[],
-  rot: number,
-  flip: boolean,
-  tile: Tile
-) {
-  visited[start] = true;
-  grid[y][x] = tile;
-  for (let i = 0; i < tiles.length; i++) {
-    const adj = adjMat[start][i];
-    if (adj) {
-      let dx = 0,
-        dy = 0;
-      switch ((adj.edge + rot) % 4) {
-        case Edge.BOTTOM:
-          dy = 1;
-          break;
-        case Edge.LEFT:
-          dx = -1;
-          break;
-        case Edge.RIGHT:
-          dx = 1;
-          break;
-        case Edge.TOP:
-          dy = -1;
-          break;
-      }
-      if (!visited[i]) {
-        if (flip) dx = -dx;
-        dfs(
-          i,
-          x + dx,
-          y + dy,
-          tiles,
-          adjMat,
-          grid,
-          visited,
-          rot + adj.b.rotate,
-          adj.b.flipped,
-          adj.b
-        );
-      }
-    }
+function findTopLeftCorner(tiles: Tile[], adjMat: AdjMat): Tile {
+  return tiles.find(
+    (_, i) =>
+      adjMat[i].filter((a) => a).length === 2 &&
+      adjMat[i].find((adj) => adj?.edge === Edge.RIGHT) &&
+      adjMat[i].find((adj) => adj?.edge === Edge.BOTTOM)
+  )!;
+}
+
+function findRightMatch(tile: Tile, tiles: Tile[]): Tile {
+  let res: Tile | null;
+  for (const ot of tiles) {
+    if (ot === tile) continue;
+    res = matchRight(tile, ot);
+    if (res) break;
   }
+  return res!;
+}
+
+function findBottomMatch(tile: Tile, tiles: Tile[]): Tile {
+  let res: Tile | null;
+  for (const ot of tiles) {
+    if (ot === tile) continue;
+    res = matchBottom(tile, ot);
+    if (res) break;
+  }
+  return res!;
+}
+
+function without(arr: Tile[], item: Tile): Tile[] {
+  return arr.filter(it => it.id !== item.id);
 }
 
 function part2(tiles: Tile[], adjMat: AdjMat): number {
   const N = Math.sqrt(adjMat.length);
   const grid = matrix<Tile>(N, N);
-  const startRow = adjMat
-    .find(
-      (row) =>
-        row.filter((a) => a).length === 2 &&
-        row.find((m) => m?.edge === Edge.RIGHT) &&
-        row.find((m) => m?.edge === Edge.BOTTOM)
-    )
-    ?.filter((a) => a);
-  const startTile = startRow![0];
-  let start = startTile?.i!;
+  let prevY = findTopLeftCorner(tiles, adjMat);
 
-  dfs(
-    start,
-    0,
-    0,
-    tiles,
-    adjMat,
-    grid,
-    Array(tiles.length).fill(false),
-    0,
-    false,
-    startTile?.a!
-  );
+  for (let y = 0; y < N; y++) {
+    grid[y][0] = prevY;
+    tiles = without(tiles, prevY);
+    let prevX = prevY;
+    // Complete the row
+    for (let x = 1; x < N; x++) {
+      const t = findRightMatch(prevX, tiles);
+      grid[y][x] = t;
+      tiles = without(tiles, t);
+      prevX = t;
+    }
+    prevY = findBottomMatch(prevY, tiles);
+  }
 
   const image = drawGrid(grid);
+
   let imageTile: Tile = {
     tile: parseTile(image),
     flipped: false,
     id: 0,
     rotate: 0,
   };
+
+  console.log(drawTile(flip(rotate(rotate(imageTile)))));
 
   let maxMatches = 0;
   let maxMatchTile: Tile;
@@ -303,7 +279,7 @@ async function day20(input: string): Promise<void> {
   const adjMat = adjacencyMatrix(tiles);
 
   console.log(`Part1: ${part1(adjMat)}`);
-  /*console.log(`Part2: ${part2(inputLines)}`);*/
+  console.log(`Part2: ${part2(tiles, adjMat)}`);
 }
 
 export default day20;
@@ -472,7 +448,6 @@ function testPart1() {
 function testPart2() {
   const tiles = getTiles(testInput);
   const adjMat = adjacencyMatrix(tiles);
-  console.log(drawTile(flip(rotate({id: 1, rotate: 0, flipped: false, tile: parseTile(in2)}))));
   assertEquals(part2(tiles, adjMat), 273);
 }
 
