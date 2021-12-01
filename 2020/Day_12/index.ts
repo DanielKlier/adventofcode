@@ -1,5 +1,5 @@
 // Solution for 2020, day 12
-import { lines } from "../utils/input.ts";
+import { lines } from "../../utils/input.ts";
 
 interface Ship {
   facing: number;

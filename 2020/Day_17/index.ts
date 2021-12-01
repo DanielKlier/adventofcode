@@ -1,6 +1,6 @@
 // Solution for 2020, day 17
-import { lines } from "../utils/input.ts";
-import { assertEquals } from "../utils/test.ts";
+import { lines } from "../../utils/input.ts";
+import { assertEquals } from "../../utils/test.ts";
 
 type Coords = [number, number, number];
 type Coords4 = [number, number, number, number];

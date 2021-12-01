@@ -1,7 +1,7 @@
 // Solution for 2020, day 23
-import { parse } from "../utils/input.ts";
-import { CList } from "../utils/list.ts";
-import { assertEquals } from "../utils/test.ts";
+import { parse } from "../../utils/input.ts";
+import { CList } from "../../utils/list.ts";
+import { assertEquals } from "../../utils/test.ts";
 
 interface State {
   current: number;

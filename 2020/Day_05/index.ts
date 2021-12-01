@@ -1,5 +1,5 @@
 // Solution for 2020, day 05
-import { assertEquals } from "../utils/test.ts";
+import { assertEquals } from "../../utils/test.ts";
 
 function seatId(seatStr: string): number {
   return parseInt(seatStr.replaceAll(/[FL]/g, "0").replaceAll(/[BR]/g, "1"), 2);

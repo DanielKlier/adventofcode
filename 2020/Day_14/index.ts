@@ -1,6 +1,6 @@
 // Solution for 2020, day 14
-import { lines } from "../utils/input.ts";
-import { assertEquals } from "../utils/test.ts";
+import { lines } from "../../utils/input.ts";
+import { assertEquals } from "../../utils/test.ts";
 
 const getMask = (mask: string) => {
   const or = BigInt("0b" + mask.replaceAll(/[^1]/g, "0"));

@@ -1,6 +1,6 @@
 // Solution for 2020, day 25
-import { lines } from "../utils/input.ts";
-import { assertEquals } from "../utils/test.ts";
+import { lines } from "../../utils/input.ts";
+import { assertEquals } from "../../utils/test.ts";
 
 function memoize(otherFn: (l: number, s: number) => number) {
   const memo = new Map<string, number>();

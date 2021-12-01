@@ -1,6 +1,6 @@
 // Solution for 2020, day 11
-import { lines } from "../utils/input.ts";
-import { assertEquals } from "../utils/test.ts";
+import { lines } from "../../utils/input.ts";
+import { assertEquals } from "../../utils/test.ts";
 
 type SeatPlan = string[][];
 

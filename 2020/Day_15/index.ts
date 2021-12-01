@@ -1,6 +1,6 @@
 // Solution for 2020, day 15
-import { parse } from "../utils/input.ts";
-import { assertEquals } from "../utils/test.ts";
+import { parse } from "../../utils/input.ts";
+import { assertEquals } from "../../utils/test.ts";
 
 interface State {
   turn: number;

@@ -1,6 +1,6 @@
 // Solution for 2020, day 19
-import { lines, parse } from "../utils/input.ts";
-import { assertEquals } from "../utils/test.ts";
+import { lines, parse } from "../../utils/input.ts";
+import { assertEquals } from "../../utils/test.ts";
 
 type Rules = Record<number, number[][] | string>;
 type Messages = string[];

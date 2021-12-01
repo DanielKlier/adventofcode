@@ -1,6 +1,6 @@
 // Solution for 2020, day 10
-import { lines, parse } from "../utils/input.ts";
-import { assertEquals } from "../utils/test.ts";
+import { lines, parse } from "../../utils/input.ts";
+import { assertEquals } from "../../utils/test.ts";
 
 function part1(joltages: number[]): number {
   const diffs: Record<1 | 2 | 3, number[]> = { 1: [], 2: [], 3: [] };

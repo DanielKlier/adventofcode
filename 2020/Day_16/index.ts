@@ -1,6 +1,6 @@
 // Solution for 2020, day 16
-import { lines, parse } from "../utils/input.ts";
-import { assertEquals, assertTrue } from "../utils/test.ts";
+import { lines, parse } from "../../utils/input.ts";
+import { assertEquals, assertTrue } from "../../utils/test.ts";
 
 interface Range {
   min: number;

@@ -1,6 +1,6 @@
 // Solution for 2020, day 18
-import { lines } from "../utils/input.ts";
-import { assertEquals } from "../utils/test.ts";
+import { lines } from "../../utils/input.ts";
+import { assertEquals } from "../../utils/test.ts";
 
 const enum TokenType {
   NUM,

@@ -1,6 +1,6 @@
 // Solution for 2020, day 13
-import { lines, parse } from "../utils/input.ts";
-import { assertEquals } from "../utils/test.ts";
+import { lines, parse } from "../../utils/input.ts";
+import { assertEquals } from "../../utils/test.ts";
 
 type Input = [number, number[]];
 

@@ -1,5 +1,5 @@
 // Solution for 2020, day 21
-import { lines } from "../utils/input.ts";
+import { lines } from "../../utils/input.ts";
 
 type Ingredient = string;
 type Allergen = string;

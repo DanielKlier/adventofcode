@@ -1,7 +1,7 @@
 // Solution for 2020, day 20
-import { matrix } from "../utils/array.ts";
-import { lines } from "../utils/input.ts";
-import { assertEquals } from "../utils/test.ts";
+import { matrix } from "../../utils/array.ts";
+import { lines } from "../../utils/input.ts";
+import { assertEquals } from "../../utils/test.ts";
 
 const monsterPattern = [
   /..................#./,

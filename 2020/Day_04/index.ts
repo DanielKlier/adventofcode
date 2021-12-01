@@ -1,4 +1,4 @@
-import { assertFalse, assertTrue } from "../utils/test.ts";
+import { assertFalse, assertTrue } from "../../utils/test.ts";
 
 // Solution for 2020, day 04
 const isValidNumerical = (digits: number, min: number, max: number) => (
@@ -146,7 +146,7 @@ async function day04(input: string): Promise<void> {
       console.log(passports[i]);
       try {
         isValidPassportAdvanced(passports[i], true);
-        
+
       } catch {}
     }
   }*/

@@ -1,5 +1,5 @@
 // Solution for 2020, day 06
-import { assertEquals } from "../utils/test.ts";
+import { assertEquals } from "../../utils/test.ts";
 
 type Group = string[][];
 

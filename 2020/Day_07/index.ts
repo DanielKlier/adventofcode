@@ -1,4 +1,4 @@
-import { assertEquals } from "../utils/test.ts";
+import { assertEquals } from "../../utils/test.ts";
 
 // Solution for 2020, day 07
 const ruleRegex = /^(?<container>[a-z ]+) bags contain (?<colors>(?:(?:\d+ [a-z ]+) bags?[,.] ?)+|no other bags.)$/gm;
@@ -34,7 +34,7 @@ function bagsContaining(rules: Rule[], bagColor: string): Set<string> {
 
 function bagsNeeded(rules: Rule[], targetBag: string): number {
   const rule = rules.find(r => r.container === targetBag);
- 
+
   let numBags = 0;
 
   rule?.contents.forEach(content => {
@@ -74,7 +74,7 @@ async function day07(input: string): Promise<void> {
   assertEquals(rules.length, 594);
 
   const targetBag = 'shiny gold';
-  
+
   const part1 = bagsContaining(rules, targetBag);
   console.log(`Part1: there are ${part1.size} other bag colors that may contain a ${targetBag} bag.`);
 

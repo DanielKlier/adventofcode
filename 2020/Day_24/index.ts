@@ -1,6 +1,6 @@
 // Solution for 2020, day 24
 // Big thanks to https://www.redblobgames.com/grids/hexagons/ for their excellent guide on hex tile maps
-import { lines } from "../utils/input.ts";
+import { lines } from "../../utils/input.ts";
 
 enum Color {
   W = "W",

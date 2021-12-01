@@ -1,6 +1,6 @@
 // Solution for 2020, day 22
-import { lines, parse } from "../utils/input.ts";
-import { assertEquals } from "../utils/test.ts";
+import { lines, parse } from "../../utils/input.ts";
+import { assertEquals } from "../../utils/test.ts";
 
 interface State {
   player1: number[];
