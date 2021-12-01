@@ -1,7 +1,7 @@
 export function lines(input: string): string[] {
-  return input.split("\n");
+  return input.trim().split("\n");
 }
 
 export const parse = {
-  int: (input: string) => parseInt(input, 10)
+  int: (input: string) => parseInt(input, 10),
 };
