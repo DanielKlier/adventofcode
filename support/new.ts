@@ -1,7 +1,7 @@
 // Generates a new puzzle from a template
-import { engineFactory } from "https://deno.land/x/view_engine@v1.4.5/mod.ts";
 import { emptyDir, exists } from "https://deno.land/std/fs/mod.ts";
-import { join, dirname, fromFileUrl } from "https://deno.land/std/path/mod.ts";
+import { dirname, fromFileUrl, join } from "https://deno.land/std/path/mod.ts";
+import { engineFactory } from "https://deno.land/x/view_engine@v1.5.0/mod.ts";
 
 const wd = dirname(fromFileUrl(import.meta.url));
 const handlebarsEngine = engineFactory.getHandlebarsEngine();
@@ -9,10 +9,9 @@ const handlebarsEngine = engineFactory.getHandlebarsEngine();
 export {};
 
 async function readTemplate(name: string): Promise<string> {
-  const path = join(wd,  `${name}.handlebars`);
+  const path = join(wd, `${name}.handlebars`);
   console.debug(`Reading template from ${path}`);
-  const contents = await Deno.readTextFile(path);
-  return contents;
+  return await Deno.readTextFile(path);
 }
 
 (async function generate() {
@@ -21,7 +20,9 @@ async function readTemplate(name: string): Promise<string> {
   const targetDir = join(wd, `../${year}/Day_${dayPadded}`);
 
   if (await exists(targetDir)) {
-    console.log(`Directory ${targetDir} already exists. Skipping bootstrapping.`);
+    console.log(
+      `Directory ${targetDir} already exists. Skipping bootstrapping.`
+    );
     Deno.exit(1);
   }
 
