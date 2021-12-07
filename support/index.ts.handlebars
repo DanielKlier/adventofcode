@@ -1,19 +1,40 @@
 // Solution for {{year}}, day {{day}}
-import { lines } from "../../utils/input.ts";
+import { Logger } from "../../utils/log.ts";
+import { assertEquals } from "../../utils/test.ts";
 
-function part1(input: unknown[]): number {
-  return 0;
+type InputType = unknown;
+
+class Day{{day}}<T = InputType> {
+  logger = new Logger(Logger.Level.Error);
+
+  private parse(input: string): T {
+    return null as unknown as T;
+  }
+
+  private part1(input: T): number {
+    return 0;
+  }
+
+  private part2(input: T): number {
+    return 0;
+  }
+
+  run(input: string) {
+    this.test();
+
+    const parsedInput = this.parse(input);
+
+    console.log(`Part1: ${this.part1(parsedInput)}`);
+    console.log(`Part2: ${this.part2(parsedInput)}`);
+  }
+
+  private test() {
+    assertEquals(true, false);
+
+    this.logger.info("Tests OK");
+  }
 }
 
-function part2(input: unknown[]): number {
-  return 0;
+export default function runDay{{day}}(input: string) {
+  new Day{{day}}().run(input);
 }
-
-async function day{{day}}(input: string): Promise<void> {
-  const inputLines = lines(input);
-
-  console.log(`Part1: ${part1(inputLines)}`);
-  console.log(`Part2: ${part2(inputLines)}`);
-}
-
-export default day{{day}};
