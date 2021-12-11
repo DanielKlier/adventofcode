@@ -1,40 +1,37 @@
-// Solution for {{year}}, day {{day}}
+// Solution for 2021, day 10
 import { Logger } from "../../utils/log.ts";
 import { assertEquals } from "../../utils/test.ts";
 
-type InputType = unknown;
+const logger = new Logger(Logger.Level.Info);
 
-class Day{{day}}<T = InputType> {
-  logger = new Logger(Logger.Level.Error);
+type PuzzleInput = unknown;
 
-  private parse(input: string): T {
-    return null as unknown as T;
-  }
-
-  private part1(input: T): number {
-    return 0;
-  }
-
-  private part2(input: T): number {
-    return 0;
-  }
-
-  run(input: string) {
-    this.test();
-
-    const parsedInput = this.parse(input);
-
-    console.log(`Part1: ${this.part1(parsedInput)}`);
-    console.log(`Part2: ${this.part2(parsedInput)}`);
-  }
-
-  private test() {
-    assertEquals(true, false);
-
-    this.logger.info("Tests OK");
-  }
+function parse(input: string): PuzzleInput {
+  throw new Error("Not implemented");
 }
 
-export default function runDay{{day}}(input: string) {
-  new Day{{day}}().run(input);
+function part1(input: PuzzleInput): number {
+  return 0;
+}
+
+function part2(input: PuzzleInput): number {
+  return 0;
+}
+
+export default function run(input: string) {
+  test();
+
+  const parsedInput = parse(input);
+
+  console.log(`Part1: ${part1(parsedInput)}`);
+  console.log(`Part2: ${part2(parsedInput)}`);
+}
+
+function test() {
+  const testInput = ``;
+
+  assertEquals(part1(parse(testInput)), Infinity);
+  assertEquals(part2(parse(testInput)), Infinity);
+
+  logger.info("Tests OK");
 }
