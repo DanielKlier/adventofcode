@@ -6,7 +6,7 @@ const logger = new Logger(Logger.Level.Info);
 
 type PuzzleInput = unknown;
 
-function parse(input: string): PuzzleInput {
+function parseInput(input: string): PuzzleInput {
   throw new Error("Not implemented");
 }
 
@@ -21,7 +21,7 @@ function part2(input: PuzzleInput): number {
 export default function run(input: string) {
   test();
 
-  const parsedInput = parse(input);
+  const parsedInput = parseInput(input);
 
   console.log(`Part1: ${part1(parsedInput)}`);
   console.log(`Part2: ${part2(parsedInput)}`);
@@ -30,8 +30,8 @@ export default function run(input: string) {
 function test() {
   const testInput = ``;
 
-  assertEquals(part1(parse(testInput)), Infinity);
-  assertEquals(part2(parse(testInput)), Infinity);
+  assertEquals(part1(parseInput(testInput)), Infinity);
+  assertEquals(part2(parseInput(testInput)), Infinity);
 
   logger.info("Tests OK");
 }
