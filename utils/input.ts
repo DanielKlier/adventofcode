@@ -11,5 +11,6 @@ export function readGrid<T>(
 
 export const parse = {
   int: (input: string) => parseInt(input, 10),
+  binary: (input: string) => parseInt(input, 2),
   numberList: (input: string) => input.split(",").map((s) => parseInt(s, 10)),
 };

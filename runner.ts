@@ -5,12 +5,12 @@ function usage() {
   console.log("Example: ./run.sh 2020 3");
 }
 
-function exitError(error: string|Error) {
+function exitError(error: string | Error) {
   console.error(error);
   Deno.exit(1);
 }
 
-function exitErrorUsage(error: string|Error) {
+function exitErrorUsage(error: string | Error) {
   console.error(error);
   usage();
   Deno.exit(1);
@@ -19,19 +19,27 @@ function exitErrorUsage(error: string|Error) {
 (async function () {
   const [year, day] = Deno.args;
 
-  if (!year || !day) {
+  if (!year || !day) {
     exitErrorUsage("Invalid arguments given");
   }
 
-  const dayForPath = day.padStart(2, '0');
+  const dayForPath = day.padStart(2, "0");
 
   let foundModule;
 
+  let packageLoadError: unknown;
   for (const ext of ["ts", "js"]) {
+    packageLoadError = null;
     const path = `./${year}/Day_${dayForPath}/index.${ext}`;
     try {
       foundModule = await import(path);
-    } catch {}
+      break;
+    } catch (e) {
+      packageLoadError = e;
+    }
+  }
+  if (packageLoadError) {
+    console.error(packageLoadError);
   }
 
   if (!foundModule) {
@@ -43,13 +51,15 @@ function exitErrorUsage(error: string|Error) {
   }
 
   let input;
-  const inputPath = `./${year}/Day_${dayForPath}/input.txt`
+  const inputPath = `./${year}/Day_${dayForPath}/input.txt`;
   try {
     input = await Deno.readTextFile(inputPath);
   } catch {
-    exitError(`Could not read problem input. Place your input in a file '${inputPath}'`)
+    exitError(
+      `Could not read problem input. Place your input in a file '${inputPath}'`
+    );
   }
-  
+
   try {
     await foundModule.default(input);
   } catch (e) {
