@@ -28,7 +28,7 @@ function exitErrorUsage(error: string | Error) {
   let foundModule;
 
   let packageLoadError: unknown;
-  for (const ext of ["ts", "js"]) {
+  for (const ext of ["ts"]) {
     packageLoadError = null;
     const path = `./${year}/Day_${dayForPath}/index.${ext}`;
     try {
