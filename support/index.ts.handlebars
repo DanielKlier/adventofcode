@@ -19,19 +19,28 @@ function part2(input: PuzzleInput): number {
 }
 
 export default function run(input: string) {
-  test();
 
+  test1();
   const parsedInput = parseInput(input);
 
-  console.log(`Part1: ${part1(parsedInput)}`);
-  console.log(`Part2: ${part2(parsedInput)}`);
+  logger.info(`Part1: ${part1(parsedInput)}`);
+
+  test2();
+  logger.info(`Part2: ${part2(parsedInput)}`);
 }
 
-function test() {
+function test1() {
   const testInput = ``;
 
   assertEquals(part1(parseInput(testInput)), Infinity);
+
+  logger.info("Tests for Part 1 OK");
+}
+
+function test2() {
+  const testInput = ``;
+
   assertEquals(part2(parseInput(testInput)), Infinity);
 
-  logger.info("Tests OK");
+  logger.info("Tests for Part 2 OK");
 }
